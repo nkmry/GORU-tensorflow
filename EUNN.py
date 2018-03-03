@@ -13,6 +13,7 @@ from tensorflow.python.ops import variable_scope as vs
 from tensorflow.python.ops.rnn_cell_impl import RNNCell
 from modrelu import modrelu
 
+
 def _eunn_param(hidden_size, capacity=2, fft=False, comp=True):
     """
     Create parameters and do the initial preparations
@@ -193,6 +194,7 @@ def _eunn_loop(state, capacity, diag_vec_list, off_vec_list, diag, fft):
     EUNN main loop, applying unitary matrix on input tensor
     """
     i = 0
+
     def layer_tunable(x, i):
 
         diag_vec = diag_vec_list.read(i)
@@ -275,8 +277,8 @@ def _eunn_loop(state, capacity, diag_vec_list, off_vec_list, diag, fft):
     if not diag is None:
         output = math_ops.multiply(output, diag)
 
-
     return output
+
 
 class EUNNCell(RNNCell):
     """Efficient Unitary Network Cell
@@ -293,8 +295,6 @@ class EUNNCell(RNNCell):
         self._comp = comp
 
         self.diag_vec, self.off_vec, self.diag, self._capacity = _eunn_param(hidden_size, capacity, fft, comp)
-
-
 
     @property
     def state_size(self):

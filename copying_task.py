@@ -9,6 +9,7 @@ import tensorflow as tf
 from EUNN import EUNNCell
 from GORU import GORUCell
 
+
 def copying_data(T, n_data, n_sequence):
     seq = np.random.randint(1, high=9, size=(n_data, n_sequence))
     zeros1 = np.zeros((n_data, T-1))
@@ -20,6 +21,7 @@ def copying_data(T, n_data, n_sequence):
     y = np.concatenate((zeros3, zeros2, seq), axis=1).astype('int64')
     
     return x, y
+
 
 def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
 
@@ -34,14 +36,11 @@ def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
     n_steps = T+20
     n_classes = 9
 
-
     # --- Create graph and compute gradients ----------------------
     x = tf.placeholder("int32", [None, n_steps])
     y = tf.placeholder("int64", [None, n_steps])
     
     input_data = tf.one_hot(x, n_input, dtype=tf.float32)
-
-
 
     # --- Input to hidden layer ----------------------
     if model == "LSTM":
@@ -78,20 +77,15 @@ def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
     correct_pred = tf.equal(tf.argmax(output_data, 2), y)
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
-
     # --- Initialization ----------------------
     optimizer = tf.train.RMSPropOptimizer(learning_rate=0.001, decay=0.9).minimize(cost)
     init = tf.global_variables_initializer()
-
-
 
     # --- baseline ----------------------
     baseline = np.log(8) * 10/(T+20)
     print("Baseline is " + str(baseline))
 
-
     # --- Training Loop ----------------------
-
 
     config = tf.ConfigProto()
     #config.gpu_options.per_process_gpu_memory_fraction = 0.2
@@ -99,7 +93,7 @@ def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
     config.allow_soft_placement = False
     with tf.Session(config=config) as sess:
 
-    # --- Create data --------------------
+        # --- Create data --------------------
 
         train_x, train_y = copying_data(T, n_train, n_sequence)
         test_x, test_y = copying_data(T, n_test, n_sequence)
@@ -122,11 +116,8 @@ def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
 
             step += 1
 
-
         print("Optimization Finished!")
 
-
-        
         # --- test ----------------------
 
         test_acc = sess.run(accuracy, feed_dict={x: test_x, y: test_y})
@@ -134,8 +125,7 @@ def main(model, T, n_iter, n_batch, n_hidden, capacity, comp, fft):
         print("Test result: Loss= " + "{:.6f}".format(test_loss) + ", Accuracy= " + "{:.5f}".format(test_acc))
 
 
-if __name__=="__main__":
-
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Copying Memory Task")
@@ -152,9 +142,9 @@ if __name__=="__main__":
     dict = vars(args)
     
     for i in dict:
-        if (dict[i]=="False"):
+        if dict[i] == "False":
             dict[i] = False
-        elif dict[i]=="True":
+        elif dict[i] == "True":
             dict[i] = True
         
     kwargs = {    
@@ -170,5 +160,3 @@ if __name__=="__main__":
 
     main(**kwargs)
 
-    
-      
